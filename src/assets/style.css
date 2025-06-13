@@ -1,0 +1,57 @@
+:root {
+  --color-bg-nav: #072a77;
+  --color-border-nav: #ffffff;
+  --color-bg: #d6dcff;
+
+  --color-bg-white-block: #f5f6ff;
+  --color-main-white: #f5f6ff;
+  --color-bg-input: #d6dcff;
+
+  --color-text-h: #1349be;
+  --color-form-label: #2b2b2b;
+
+  --color-text-btn: #f5f6ff;
+  --color-bg-btn: #1349be;
+  --color-bg-btn-hover: #d6dcff;
+
+  --color-text-gray: #efefef;
+  --font-family: Arial, sans-serif;
+  --line-height: 1.6;
+
+  --border-radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  line-height: var(--line-height);
+  background-color: var(--color-bg);
+}
+
+.btn {
+  padding: 20px 40px;
+  font-size: 24px;
+  background-color: var(--color-bg-btn);
+  color: var(--color-text-btn);
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background-color: var(--color-bg-btn-hover);
+  border: 1px solid var(--color-bg-btn);
+  color: var(--color-bg-btn);
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}

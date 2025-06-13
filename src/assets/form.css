@@ -1,0 +1,24 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 10px 0 20px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  font-size: 24px;
+}
+
+.error-message {
+  color: rgb(123, 9, 9);
+}
+
+input {
+  padding: 17px 15px;
+  border-radius: var(--border-radius);
+  border: none;
+  background-color: var(--color-bg-input);
+  font-size: 25px;
+}
