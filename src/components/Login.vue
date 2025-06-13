@@ -24,7 +24,6 @@ const formSubmit = async () => {
   v$.value.$touch();
   if (!v$.value.$invalid) {
     try {
-      console.log(form);
       await authStore.login(form);
       router.push("/tasks");
     } catch (error) {
