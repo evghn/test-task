@@ -27,7 +27,12 @@ export const useAuthStore = defineStore("auth", () => {
   const login = async (credentials) => {
     try {
       console.log(credentials);
-      const response = await http.post(API_URLS.login, credentials);
+      const response = await http.post(API_URLS.login, credentials, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: false,
+      });
       setAuth(response.data.user, response.data.token);
       router.push("/tasks");
     } catch (err) {
