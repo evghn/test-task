@@ -27,10 +27,10 @@ const formSubmit = async () => {
   if (!v$.value.$invalid) {
     try {
       const response = await authStore.login(form);
-      console.log(response);
+      // console.log(response);
       if (response) {
-        console.log(authStore.isGuest.value);
-        // router.push("/tasks");
+        // console.log(authStore.isGuest);
+        router.push("/tasks");
       }
     } catch (error) {
       // Ошибка уже обработана в хранилище

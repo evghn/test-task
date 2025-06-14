@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-// import TasksView from "@/views/MainTasks.vue";
+import MainTasks from "@/views/MainTasks.vue";
 // import NewTaskView from "@/views/NewTaskView.vue";
 // import EditTaskView from "@/views/EditTaskView.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -8,7 +8,7 @@ const routes = [
   {
     path: "/tasks",
     name: "tasks",
-    // component: MainTasks,
+    component: MainTasks,
     meta: { requiresAuth: true },
   },
   {
@@ -33,12 +33,7 @@ const routes = [
 
   {
     path: "/",
-    redirect: (to) => {
-      return {
-        path: "/tasks",
-        replace: true,
-      };
-    },
+    redirect: "tasks",
   },
 ];
 
@@ -51,8 +46,7 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   // Проверяем авторизацию только если она требуется для маршрута
   if (to.meta.requiresAuth) {
-    const isGuest = authStore.isGuest.value;
-    if (!isGuest) {
+    if (!authStore.isGuest) {
       return next({
         name: "login",
         query: { redirect: to.fullPath },

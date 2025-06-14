@@ -9,7 +9,7 @@ export const useAuthStore = defineStore("auth", () => {
   const error = ref(null);
 
   const isGuest = computed(() => {
-    return !token.value.length;
+    return !!token.value.length;
   });
 
   const setAuth = (userData, authToken) => {
@@ -31,9 +31,14 @@ export const useAuthStore = defineStore("auth", () => {
       const response = await http.post(API_URLS.login, credentials);
       if (response?.data.token) {
         setAuth(credentials, response.data.token);
-        // router.push("/tasks");
+        router.push("/tasks");
         return true;
       }
+      // if (true) {
+      //   setAuth(credentials, "kbkuqekUKUBkbkubkubk");
+      //   // router.push("/tasks");
+      //   return true;
+      // }
 
       return false;
     } catch (err) {

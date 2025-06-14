@@ -22,18 +22,18 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://sferum-rtk.infobox.vip/api-tasks",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api-tasks/, ""),
-        // Дополнительные настройки если нужно:
-        secure: false, // если используете самоподписанные сертификаты
-        // configure: (proxy, options) => {
-        //   // Дополнительная конфигурация если нужно
-        // },
-      },
-    },
-  },
+  // server: {
+  //   proxy: {
+  //     "/api": {
+  //       target: "https://sferum-rtk.infobox.vip/api-tasks",
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api-tasks/, ""),
+  //       // Дополнительные настройки если нужно:
+  //       secure: false, // если используете самоподписанные сертификаты
+  //       // configure: (proxy, options) => {
+  //       //   // Дополнительная конфигурация если нужно
+  //       // },
+  //     },
+  //   },
+  // },
 });
