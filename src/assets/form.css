@@ -13,6 +13,7 @@
 
 .error-message {
   color: rgb(123, 9, 9);
+  font-size: 24px;
 }
 
 input {
@@ -21,4 +22,10 @@ input {
   border: none;
   background-color: var(--color-bg-input);
   font-size: 25px;
+}
+
+input.is-invalid {
+  background-color: #ffd5d1;
+  color: red;
+  border: 2px solid #960d00 !important;
 }

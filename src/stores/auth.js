@@ -25,10 +25,10 @@ export const useAuthStore = defineStore("auth", () => {
       const response = await http.post(API_URLS.login, credentials);
       if (response?.data.token) {
         setAuth(credentials, response.data.token);
-        router.push("/tasks");
+        // router.push("/tasks");
         return true;
       }
-
+      error.value = response.data;
       return false;
     } catch (err) {
       error.value = err.response?.data?.message || err.message;

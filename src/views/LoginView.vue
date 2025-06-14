@@ -1,37 +1,40 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 
-const authStore = useAuthStore();
+const auth = useAuthStore();
 const router = useRouter();
 
-const form = reactive({
+const form = ref({
     login: "",
     password: "",
 });
-
+const errorForm = ref("");
 const rules = {
     login: { required },
     password: { required },
 };
 
-const v$ = useVuelidate(rules, form);
+const v$ = useVuelidate(rules, form.value);
 
 const formSubmit = async () => {
     v$.value.$touch();
     if (!v$.value.$invalid) {
         try {
-            const response = await authStore.login(form);
-
+            const response = await auth.login(form.value);
+            console.log(response)
             if (response) {
 
                 router.push("/tasks");
+            } else {
+                console.log(response)
             }
-        } catch (error) {
-            // Ошибка уже обработана в хранилище
+        } catch (err) {
+            errorForm.value = auth.error
+            console.log(auth.error)
         }
     }
 };
@@ -39,11 +42,11 @@ const formSubmit = async () => {
 <template>
     <div class="auth-view">
         <h1>Авторизация</h1>
-        <form @submit.prevent="formSubmit">
+        <form @submit.prevent="formSubmit()">
             <div class="form-group">
                 <label class="label">
                     Логин
-                    <input v-model="form.login" required @blur="v$.login.$touch" />
+                    <input v-model="form.login" @blur="v$.login.$touch" :class="v$.login.$error ? 'is-invalid' : ''" />
                 </label>
                 <span v-if="v$.login.$error" class="error-message">
                     Логин обязателен для заполнения
@@ -53,20 +56,21 @@ const formSubmit = async () => {
             <div class="form-group">
                 <label class="label">
                     Пароль
-                    <input v-model="form.password" type="password" required @blur="v$.password.$touch" />
+                    <input v-model="form.password" type="password" @blur="v$.password.$touch"
+                        :class="v$.password.$error ? 'is-invalid' : ''" />
                 </label>
                 <span v-if="v$.password.$error" class="error-message">
                     Пароль обязателен для заполнения
                 </span>
             </div>
+            <div v-if="errorForm" class="error-message">
+                {{ errorForm }}
+            </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn" :disabled="v$.$invalid">Вход</button>
+                <button type="submit" class="btn">Вход</button>
             </div>
 
-            <div v-if="error" class="error-message">
-                {{ error }}
-            </div>
         </form>
     </div>
 </template>
