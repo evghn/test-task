@@ -6,7 +6,7 @@ export const API_URLS = {
   login: `${API_BASE_URL}/login`,
   tasks: `${API_BASE_URL}/login`,
   edit: `${API_BASE_URL}/tasks/`,
-  login: `${API_BASE_URL}/login`,
+  logout: `${API_BASE_URL}/logout`,
 };
 
 export const http = axios.create({

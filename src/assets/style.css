@@ -17,6 +17,7 @@
   --color-text-gray: #efefef;
   --font-family: Arial, sans-serif;
   --line-height: 1.6;
+  --font-size-link: 24px;
 
   --border-radius: 10px;
 }
@@ -44,6 +45,30 @@ body {
   font-weight: 600;
 }
 
+.d-flex {
+  display: flex;
+}
+
+.justify-content-beetween {
+  justify-content: space-between;
+}
+
+.gap-3 {
+  gap: 30px;
+}
+
+a {
+  font-size: var(--font-size-link);
+  cursor: pointer;
+}
+.link {
+  color: var(--color-bg);
+}
+
+.link:hover {
+  color: var(---color-bg-btn-hover);
+}
+
 .btn:hover {
   background-color: var(--color-bg-btn-hover);
   border: 1px solid var(--color-bg-btn);
@@ -52,6 +77,6 @@ body {
 
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    /* background-color: hsla(160, 100%, 37%, 0.2); */
   }
 }
