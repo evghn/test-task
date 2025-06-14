@@ -8,8 +8,6 @@ import { useRouter } from "vue-router";
 const authStore = useAuthStore();
 const router = useRouter();
 
-// console.log(authStore.isGuest.value);
-
 const form = reactive({
   login: "user",
   password: "123",
@@ -26,12 +24,8 @@ const formSubmit = async () => {
   v$.value.$touch();
   if (!v$.value.$invalid) {
     try {
-      const response = await authStore.login(form);
-      // console.log(response);
-      if (response) {
-        // console.log(authStore.isGuest);
-        router.push("/tasks");
-      }
+      await authStore.login(form);
+      router.push("/tasks");
     } catch (error) {
       // Ошибка уже обработана в хранилище
     }
