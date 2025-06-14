@@ -9,8 +9,8 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const form = reactive({
-    login: "user",
-    password: "123",
+    login: "",
+    password: "",
 });
 
 const rules = {
