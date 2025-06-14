@@ -8,7 +8,9 @@ export const useAuthStore = defineStore("auth", () => {
   const token = ref("");
   const error = ref(null);
 
-  const isGuest = computed(() => !!token.value);
+  const isGuest = computed(() => {
+    return !token.value.length;
+  });
 
   const setAuth = (userData, authToken) => {
     user.value = userData;
@@ -27,8 +29,13 @@ export const useAuthStore = defineStore("auth", () => {
   const login = async (credentials) => {
     try {
       const response = await http.post(API_URLS.login, credentials);
-      setAuth(response.data.user, response.data.token);
-      router.push("/tasks");
+      if (response?.data.token) {
+        setAuth(credentials, response.data.token);
+        // router.push("/tasks");
+        return true;
+      }
+
+      return false;
     } catch (err) {
       error.value = err.response?.data?.message || err.message;
       throw err;

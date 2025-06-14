@@ -25,9 +25,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://max220mm.beget.tech",
+        target: "https://sferum-rtk.infobox.vip/api-tasks",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/api-tasks/, ""),
         // Дополнительные настройки если нужно:
         secure: false, // если используете самоподписанные сертификаты
         // configure: (proxy, options) => {

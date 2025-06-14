@@ -49,7 +49,6 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  console.log(authStore);
   // Проверяем авторизацию только если она требуется для маршрута
   if (to.meta.requiresAuth) {
     const isGuest = authStore.isGuest.value;
