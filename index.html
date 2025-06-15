@@ -1,13 +1,62 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vite App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./src/assets/font.css">
+  <script>
+    // Конфигурация Tailwind (аналог tailwind.config.js)
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            danger: '#EF4444',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .slide-enter-active,
+    .slide-leave-active {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .slide-enter-from,
+    .slide-leave-to {
+      max-height: 0;
+      opacity: 0;
+    }
+
+    .slide-enter-to,
+    .slide-leave-from {
+      max-height: 1000px;
+      opacity: 1;
+    }
+
+    .slide-down-enter-active,
+    .slide-down-leave-active {
+      transition: all 0.3s ease;
+    }
+
+    .slide-down-enter-from,
+    .slide-down-leave-to {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-20px);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

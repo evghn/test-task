@@ -1,21 +1,29 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { http, API_URLS } from "@/api/http";
-import router from "@/router";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
-  const token = ref("");
+  const token = ref(localStorage.getItem("token") ?? "");
+
+  const userLocal = localStorage.getItem("user");
+
+  if (token.value && userLocal) {
+    const parsed = JSON.parse(userLocal);
+    user.value = { login: parsed.login };
+  }
+
   const error = ref(null);
 
-  const isGuest = computed(() => {
-    return !!token.value.length;
+  let isGuest = computed(() => {
+    return !token.value.length;
   });
 
   const setAuth = (userData, authToken) => {
     user.value = userData;
     token.value = authToken;
     localStorage.setItem("token", authToken);
+    localStorage.setItem("user", JSON.stringify({ login: user.value.login }));
     http.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
     http.defaults.withCredentials = true;
   };
@@ -26,7 +34,7 @@ export const useAuthStore = defineStore("auth", () => {
       if (response?.data.token) {
         setAuth(credentials, response.data.token);
         // router.push("/tasks");
-        return true;
+        return response;
       }
       error.value = response.data;
       return false;
@@ -37,6 +45,15 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const clearAuth = () => {
+    user.value = null;
+    token.value = "";
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    delete http.defaults.headers.common["Authorization"];
+    http.defaults.withCredentials = false;
+  };
+
   const logout = async () => {
     try {
       const response = await http.post(API_URLS.logout, {
@@ -45,33 +62,14 @@ export const useAuthStore = defineStore("auth", () => {
         },
       });
       if (response.status == 204) {
-        user.value = null;
-        token.value = "";
-        localStorage.removeItem("token");
-        delete http.defaults.headers.common["Authorization"];
-        http.defaults.withCredentials = false;
+        clearAuth();
         return true;
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return false;
     }
   };
-
-  // const checkAuth = async () => {
-  //   if (token.value) {
-  //     try {
-  //       isLoading.value = true;
-  //       http.defaults.headers.common["Authorization"] = `Bearer ${token.value}`;
-  //       const response = await http.get("/api/auth/me");
-  //       user.value = response.data.user;
-  //     } catch (err) {
-  //       clearAuth();
-  //     } finally {
-  //       isLoading.value = false;
-  //     }
-  //   }
-  // };
 
   const setAuthHeader = (token = token.value) => {
     if (token) {
@@ -79,13 +77,25 @@ export const useAuthStore = defineStore("auth", () => {
       http.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       http.defaults.withCredentials = true; // Включаем отправку credentials
     } else {
-      delete http.defaults.headers.common["Authorization"];
-      http.defaults.withCredentials = false; // Отключаем для неавторизованных запросов
+      clearAuth();
+    }
+  };
+
+  const checkAuth = async () => {
+    console.log(token.value);
+    if (token.value) {
+      try {
+        setAuthHeader();
+        const response = await http.post(API_URLS.auth);
+        user.value = response.data.user;
+      } catch (err) {
+        clearAuth();
+      }
     }
   };
 
   // Инициализируем при старте приложения
-  setAuthHeader(localStorage.getItem("authToken"));
+  checkAuth();
 
   return {
     user,

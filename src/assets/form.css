@@ -24,7 +24,7 @@ input {
   font-size: 25px;
 }
 
-input.is-invalid {
+.is-invalid {
   background-color: #ffd5d1;
   color: red;
   border: 2px solid #960d00 !important;

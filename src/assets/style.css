@@ -6,16 +6,16 @@
   --color-bg-white-block: #f5f6ff;
   --color-main-white: #f5f6ff;
   --color-bg-input: #d6dcff;
+  --color-bg-is_invalid: #ffd4d0;
 
-  --color-text-h: #1349be;
+  --color-text: #1349be;
   --color-form-label: #2b2b2b;
 
   --color-text-btn: #f5f6ff;
   --color-bg-btn: #1349be;
   --color-bg-btn-hover: #d6dcff;
-
   --color-text-gray: #efefef;
-  --font-family: Arial, sans-serif;
+  --font-family: "Actay Light";
   --line-height: 1.6;
   --font-size-link: 24px;
 
@@ -40,7 +40,7 @@ body {
   background-color: var(--color-bg-btn);
   color: var(--color-text-btn);
   border-radius: 5px;
-  border: none;
+  border: 1px solid var(--color-bg-btn);
   cursor: pointer;
   font-weight: 600;
 }

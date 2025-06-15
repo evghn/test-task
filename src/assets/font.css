@@ -1,0 +1,21 @@
+@font-face {
+  font-family: "Actay Condensed Thin";
+  font-weight: 250;
+  font-style: normal;
+  font-display: swap;
+  src: url("fonts/ActayCondensed-Thin.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Actay Light";
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/Actay-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Actay Wide Bd";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("fonts/ActayWide-Bold.otf") format("opentype");
+}
