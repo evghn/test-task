@@ -4,64 +4,88 @@ import { useTasksStore } from '@/stores/tasks'
 import { useUIStore } from '@/stores/ui'
 
 const props = defineProps({
-    task: {
-        type: Object,
-        required: true
-    },
-    level: {
-        type: Number,
-        default: 0
-    },
-    searchTerm: {
-        type: String,
-        default: ''
-    }
+    task: Object,
+    level: Number,
+    searchTerm: String
 })
 
-const emit = defineEmits(['task-moved'])
+const emit = defineEmits(['task-moved', 'edit-task'])
 
 const tasksStore = useTasksStore()
 const uiStore = useUIStore()
 
 // Состояние
+const isEditing = ref(false)
+const editedTitle = ref('')
 const dragState = ref({
     isDragging: false,
-    isDragOver: false,
-    isChildDragOver: false
+    isDragOver: false
 })
-const isExpanded = ref(false)
 
 // Вычисляемые свойства
 const children = computed(() => tasksStore.getChildren(props.task.id))
 const hasChildren = computed(() => children.value.length > 0)
+const isExpanded = computed(() => uiStore.isTaskExpanded(props.task.id))
 const isHighlighted = computed(() =>
     props.searchTerm &&
     props.task.title.toLowerCase().includes(props.searchTerm.toLowerCase())
 )
 
+// Методы
+const toggleExpand = () => {
+    uiStore.toggleTaskExpansion(props.task.id)
+}
+
+const handleDoubleClick = () => {
+    if (hasChildren.value) {
+        toggleExpand()
+    }
+}
+
+const startEditing = () => {
+    editedTitle.value = props.task.title
+    isEditing.value = true
+}
+
+const saveEditing = async () => {
+    try {
+        await tasksStore.updateTask({
+            id: props.task.id,
+            title: editedTitle.value
+        })
+        isEditing.value = false
+    } catch (error) {
+        console.error('Error updating task:', error)
+    }
+}
+
+const deleteTask = async () => {
+    if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+        try {
+            await tasksStore.deleteTask(props.task.id)
+        } catch (error) {
+            console.error('Error deleting task:', error)
+        }
+    }
+}
+
 // Drag-and-drop методы
 const handleDragStart = (e) => {
     e.dataTransfer.setData('text/plain', props.task.id)
     dragState.value.isDragging = true
-    setTimeout(() => {
-        e.target.classList.add('opacity-30')
-    }, 0)
 }
 
-const handleDragEnd = (e) => {
+const handleDragEnd = () => {
     dragState.value.isDragging = false
-    e.target.classList.remove('opacity-30')
 }
 
 const handleDragOver = (e) => {
     e.preventDefault()
     dragState.value.isDragOver = true
-    e.dataTransfer.dropEffect = 'move'
 }
 
 const handleDragLeave = () => {
     dragState.value.isDragOver = false
-    dragState.value.isChildDragOver = false
 }
 
 const handleDrop = async (e) => {
@@ -71,32 +95,8 @@ const handleDrop = async (e) => {
     const draggedTaskId = e.dataTransfer.getData('text/plain')
     if (draggedTaskId === props.task.id) return
 
-    try {
-        await tasksStore.moveTask(draggedTaskId, props.task.id)
-        emit('task-moved')
-    } catch (error) {
-        console.error('Error moving task:', error)
-    }
-}
-
-const handleChildrenDragOver = (e) => {
-    e.preventDefault()
-    dragState.value.isChildDragOver = true
-}
-
-const handleChildrenDrop = async (e) => {
-    e.preventDefault()
-    dragState.value.isChildDragOver = false
-
-    const draggedTaskId = e.dataTransfer.getData('text/plain')
-    if (draggedTaskId === props.task.id) return
-
-    try {
-        await tasksStore.moveTask(draggedTaskId, props.task.id)
-        emit('task-moved')
-    } catch (error) {
-        console.error('Error moving task:', error)
-    }
+    await tasksStore.moveTask(draggedTaskId, props.task.id)
+    emit('task-moved')
 }
 </script>
 
@@ -105,14 +105,14 @@ const handleChildrenDrop = async (e) => {
         <!-- Task header -->
         <div :style="{ paddingLeft: `${level * 20 + 12}px` }" draggable="true" @dragstart="handleDragStart"
             @dragend="handleDragEnd" @dragover="handleDragOver" @dragleave="handleDragLeave" @drop="handleDrop"
-            @click="isExpanded = !isExpanded" class="flex items-center py-2 px-3 cursor-pointer transition-all" :class="{
-                'bg-blue-100': dragState.isDragOver,
+            @dblclick="handleDoubleClick" class="flex items-center py-2 px-3 cursor-pointer transition-all group"
+            :class="{
+                'bg-blue-50': dragState.isDragOver,
                 'bg-yellow-100': isHighlighted,
-                'hover:bg-gray-100': !dragState.isDragOver && !isHighlighted,
-                'opacity-30': dragState.isDragging
+                'hover:bg-gray-100': !dragState.isDragOver && !isHighlighted
             }">
             <!-- Toggle icon -->
-            <span v-if="hasChildren"
+            <span v-if="hasChildren" @click.stop="toggleExpand"
                 class="w-5 h-5 flex items-center justify-center mr-2 text-gray-500 transition-transform"
                 :class="{ 'rotate-90': isExpanded }">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -122,33 +122,41 @@ const handleChildrenDrop = async (e) => {
             </span>
             <span v-else class="w-5 h-5 mr-2"></span>
 
-            <!-- Task title -->
-            <span class="flex-grow truncate">
+            <!-- Task title (edit mode) -->
+            <input v-if="isEditing" v-model="editedTitle" @keyup.enter="saveEditing" @blur="saveEditing"
+                @keyup.esc="isEditing = false"
+                class="flex-grow px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autofocus>
+
+            <!-- Task title (view mode) -->
+            <span v-else class="flex-grow">
                 {{ task.title }}
             </span>
 
-            <!-- Drag handle -->
-            <span class="w-4 h-4 text-gray-400 hover:text-gray-600 ml-2" @click.stop @mousedown.stop>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-                </svg>
-            </span>
+            <!-- Actions -->
+            <div v-if="!isEditing"
+                class="flex items-center space-x-2 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button @click.stop="startEditing" class="text-gray-500 hover:text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </button>
+                <button @click.stop="deleteTask" class="text-gray-500 hover:text-red-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Drop zone indicator -->
-        <div v-if="dragState.isDragOver" class="absolute left-0 right-0 h-1 bg-blue-400 z-10"
-            :style="{ top: `${level * 20 + 40}px` }"></div>
-
-        <!-- Children container -->
-        <div v-if="hasChildren && isExpanded" @dragover="handleChildrenDragOver" @dragleave="handleDragLeave"
-            @drop="handleChildrenDrop" class="relative transition-all" :class="{
-                'min-h-8 bg-blue-50': dragState.isChildDragOver
-            }">
+        <!-- Children -->
+        <div v-if="hasChildren && isExpanded" class="ml-2">
             <TaskItem v-for="child in children" :key="child.id" :task="child" :level="level + 1"
-                :search-term="searchTerm" @task-moved="emit('task-moved')" />
-
-            <!-- Child drop zone indicator -->
-            <div v-if="dragState.isChildDragOver" class="absolute bottom-0 left-0 right-0 h-1 bg-blue-400 z-10"></div>
+                :search-term="searchTerm" @task-moved="$emit('task-moved')" @edit-task="$emit('edit-task', $event)" />
         </div>
     </div>
 </template>

@@ -70,20 +70,13 @@ export const useTasksStore = defineStore("tasks", () => {
   };
 
   const updateTask = async (taskData) => {
-    isLoading.value = true;
     try {
-      const response = await http.put(
-        `${API_URLS.tasks}/${taskData.id}`,
-        taskData
-      );
-      const index = tasks.value.findIndex((t) => t.id === taskData.id);
-      if (index !== -1) {
-        tasks.value[index] = response.data;
-      }
-      return response.data;
-    } catch (err) {
-      error.value = err.response?.data?.message || err.message;
-      throw err;
+      isLoading.value = true;
+      await api.updateTask(taskData);
+      await getTasks(); // Обновляем список
+    } catch (error) {
+      error.value = error.message;
+      throw error;
     } finally {
       isLoading.value = false;
     }
@@ -105,21 +98,16 @@ export const useTasksStore = defineStore("tasks", () => {
   };
 
   const moveTask = async (taskId, newParentId) => {
-    if (newParentId && isDescendant(taskId, newParentId)) {
-      error.value = "Cannot move task to its own descendant";
-      throw new Error(error.value);
+    try {
+      isLoading.value = true;
+      await api.moveTask(taskId, newParentId);
+      await getTasks(); // Обновляем список
+    } catch (error) {
+      error.value = error.message;
+      throw error;
+    } finally {
+      isLoading.value = false;
     }
-
-    const task = getTaskById(taskId);
-    if (!task) {
-      error.value = "Task not found";
-      throw new Error(error.value);
-    }
-
-    return await updateTask({
-      ...task,
-      parent_id: newParentId,
-    });
   };
 
   // Методы для работы с выбором родителя
