@@ -8,10 +8,15 @@ const route = useRoute()
 const router = useRouter()
 const tasksStore = useTasksStore()
 
+
+
 const task = computed(() => {
     return tasksStore.getTaskById(parseInt(route.params.id))
 })
-
+onMounted(async () => {
+    await tasksStore.getTasks()
+    task.value = tasksStore.getTaskById(Number(route.params.id))
+})
 const handleSubmit = async (taskData) => {
     try {
         await tasksStore.updateTask(taskData)
@@ -20,7 +25,7 @@ const handleSubmit = async (taskData) => {
         console.error('Error updating task:', error)
     }
 }
-
+console.log(task)
 const handleCancel = () => {
     router.push('/tasks')
 }

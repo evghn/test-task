@@ -82,14 +82,21 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const checkAuth = async () => {
-    console.log(token.value);
     if (token.value) {
       try {
         setAuthHeader();
         const response = await http.post(API_URLS.auth);
-        user.value = response.data.user;
+        if (response.status == 200) {
+          user.value = response.data.user;
+          console.log(user.value);
+          return true;
+        } else {
+          clearAuth();
+          return false;
+        }
       } catch (err) {
         clearAuth();
+        return false;
       }
     }
   };
@@ -104,5 +111,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     isGuest,
+    checkAuth,
   };
 });

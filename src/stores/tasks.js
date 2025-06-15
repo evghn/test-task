@@ -35,13 +35,7 @@ export const useTasksStore = defineStore("tasks", () => {
 
   // Основные действия
   const getTasks = async () => {
-    console.log("task load");
-    console.log("Текущий статус авторизации", {
-      isGuest: auth.isGuest,
-      token: auth.token, // если используется
-    });
     if (auth.isGuest) return;
-
     isLoading.value = true;
     error.value = null;
     try {
@@ -70,9 +64,10 @@ export const useTasksStore = defineStore("tasks", () => {
   };
 
   const updateTask = async (taskData) => {
+    console.log(taskData);
     try {
       isLoading.value = true;
-      await api.updateTask(taskData);
+      await http.patch(`${API_URLS.edit}`, taskData);
       await getTasks(); // Обновляем список
     } catch (error) {
       error.value = error.message;

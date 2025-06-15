@@ -9,6 +9,14 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const tasksStore = useTasksStore()
+const props = defineProps({
+    initialData: {
+        type: Object,
+        default: () => ({ title: '', parent_id: null })
+    }
+})
+const emit = defineEmits(['submit'])
+
 
 // Реактивные данные
 const currentPath = reactive([]) // Хранит выбранный путь в иерархии
@@ -24,8 +32,8 @@ const rules = {
 
 const v$ = useVuelidate(rules, form)
 
-// Вычисляемые свойства
-const isLoading = computed(() => tasksStore.isLoading)
+
+
 
 // Методы
 const openTaskTree = () => {

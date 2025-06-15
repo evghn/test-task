@@ -8,7 +8,7 @@ const tasksStore = useTasksStore()
 
 const handleSubmit = async (taskData) => {
     try {
-        await tasksStore.addTask(taskData)
+        await tasksStore.createTask(taskData)
         router.push('/tasks')
     } catch (error) {
         console.error('Error creating task:', error)

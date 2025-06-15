@@ -67,7 +67,7 @@ const confirmSelection = () => {
 
     router.push({
         name: route.query.redirect || 'task-create',
-        query
+        query: { ...route.query, parentId }
     })
 }
 </script>

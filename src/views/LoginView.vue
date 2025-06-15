@@ -9,8 +9,8 @@ const auth = useAuthStore();
 const router = useRouter();
 
 const form = ref({
-    login: "",
-    password: "",
+    login: "user",
+    password: "123",
 });
 
 const errorForm = computed(() => {
