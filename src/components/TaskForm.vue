@@ -51,7 +51,11 @@ const handleSubmit = async () => {
             await tasksStore.getTasks()
             router.push({ name: 'tasks' }) // Переход после успешного создания
         } catch (error) {
-            console.error('Ошибка при создании задачи:', error)
+            if (error.response?.data?.errors) {
+                error.response.data.errors.forEach(err => {
+                    v$.value[err.field].$errors.push({ $message: err.message })
+                })
+            }
         }
     }
 }

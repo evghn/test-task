@@ -132,7 +132,9 @@ const handleDrop = async (e) => {
             <span v-else class="flex-grow">
                 {{ task.title }}
             </span>
-
+            <div v-if="dragState.isDragOver" class="absolute inset-x-0 h-0.5 bg-blue-500 z-10"
+                :style="{ top: level * 20 + 44 + 'px' }">
+            </div>
             <!-- Actions -->
             <div v-if="!isEditing"
                 class="flex items-center space-x-2 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">

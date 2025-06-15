@@ -18,11 +18,11 @@ const uiStore = useUIStore()
 
 // Автоматически раскрывать родительские элементы при поиске
 watch(() => props.searchTerm, (term) => {
+    const uiStore = useUIStore()
     if (!term) return
 
-    const searchLower = term.toLowerCase()
     tasksStore.tasks.forEach(task => {
-        if (task.title.toLowerCase().includes(searchLower)) {
+        if (task.title.toLowerCase().includes(term.toLowerCase())) {
             let parentId = task.parent_id
             while (parentId) {
                 uiStore.expandTask(parentId)
