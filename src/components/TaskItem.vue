@@ -15,8 +15,8 @@ const tasksStore = useTasksStore()
 const uiStore = useUIStore()
 
 // Состояние
-const isEditing = ref(false)
-const editedTitle = ref('')
+
+
 const dragState = ref({
     isDragging: false,
     isDragOver: false
@@ -41,22 +41,8 @@ const handleDoubleClick = () => {
         toggleExpand()
     }
 }
-
-const startEditing = () => {
-    editedTitle.value = props.task.title
-    isEditing.value = true
-}
-
-const saveEditing = async () => {
-    try {
-        await tasksStore.updateTask({
-            id: props.task.id,
-            title: editedTitle.value
-        })
-        isEditing.value = false
-    } catch (error) {
-        console.error('Error updating task:', error)
-    }
+const editTask = () => {
+    router.push(`/tasks/${props.task.id}/edit`)
 }
 
 const deleteTask = async () => {
@@ -122,23 +108,17 @@ const handleDrop = async (e) => {
             </span>
             <span v-else class="w-5 h-5 mr-2"></span>
 
-            <!-- Task title (edit mode) -->
-            <input v-if="isEditing" v-model="editedTitle" @keyup.enter="saveEditing" @blur="saveEditing"
-                @keyup.esc="isEditing = false"
-                class="flex-grow px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                autofocus>
 
             <!-- Task title (view mode) -->
-            <span v-else class="flex-grow">
+            <span class="flex-grow">
                 {{ task.title }}
             </span>
             <div v-if="dragState.isDragOver" class="absolute inset-x-0 h-0.5 bg-blue-500 z-10"
                 :style="{ top: level * 20 + 44 + 'px' }">
             </div>
             <!-- Actions -->
-            <div v-if="!isEditing"
-                class="flex items-center space-x-2 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button @click.stop="startEditing" class="text-gray-500 hover:text-blue-600">
+            <div class="flex items-center space-x-2 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button @click.stop="editTask" class="text-gray-500 hover:text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
