@@ -15,10 +15,14 @@ export const useTasksStore = defineStore("tasks", () => {
     childId: null,
   });
 
+  http.defaults.headers.common["Authorization"] = `Bearer ${auth.token}`;
+  http.defaults.withCredentials = true;
+
   // Геттеры
   const rootTasks = computed(() => getChildren(null));
 
-  const getTaskById = (id) => tasks.value.find((task) => task.id === id);
+  const getTaskById = (id) =>
+    tasks.value.find((task) => task.id === id) || null;
 
   const getChildren = (parentId) =>
     tasks.value.filter((task) => task.parent_id === parentId);
@@ -67,7 +71,7 @@ export const useTasksStore = defineStore("tasks", () => {
     console.log(taskData);
     try {
       isLoading.value = true;
-      await http.patch(`${API_URLS.edit}`, taskData);
+      await http.post(`${API_URLS.edit}/${taskData}`);
       await getTasks(); // Обновляем список
     } catch (error) {
       error.value = error.message;
@@ -80,7 +84,7 @@ export const useTasksStore = defineStore("tasks", () => {
   const deleteTask = async (taskId) => {
     isLoading.value = true;
     try {
-      await http.delete(`${API_URLS.tasks}/${taskId}`);
+      await http.post(`${API_URLS.delete}/${taskId}`);
       tasks.value = tasks.value.filter(
         (task) => task.id !== taskId && task.parent_id !== taskId
       );
@@ -95,7 +99,7 @@ export const useTasksStore = defineStore("tasks", () => {
   const moveTask = async (taskId, newParentId) => {
     try {
       isLoading.value = true;
-      await api.moveTask(taskId, newParentId);
+      await http.post(`${API_URLS.move}/${taskId}/${newParentId}`);
       await getTasks(); // Обновляем список
     } catch (error) {
       error.value = error.message;

@@ -36,6 +36,7 @@ const routes = [
     path: "/tasks/:id/edit",
     component: EditTaskView,
     name: "edit-task",
+    props: true,
   },
   {
     path: "/",

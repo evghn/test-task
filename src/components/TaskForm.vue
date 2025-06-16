@@ -9,14 +9,13 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const tasksStore = useTasksStore()
-const props = defineProps({
-    initialData: {
-        type: Object,
-        default: () => ({ title: '', parent_id: null })
-    }
+const { task } = defineProps({
+    task: Object,
 })
 const emit = defineEmits(['submit'])
+const isEditMode = computed(() => !!task)
 
+console.log(task)
 
 // Реактивные данные
 const currentPath = reactive([]) // Хранит выбранный путь в иерархии
@@ -25,6 +24,8 @@ const form = reactive({
     title: '',
     parent_id: null // ID родительской задачи
 })
+
+
 
 const rules = {
     title: { required }
@@ -52,12 +53,18 @@ const handleSubmit = async () => {
 
     if (!v$.value.$invalid) {
         try {
-            await tasksStore.createTask({
-                title: form.title,
-                parent_id: currentPath.length ? currentPath[currentPath.length - 1].id : null
-            })
-            await tasksStore.getTasks()
-            router.push({ name: 'tasks' }) // Переход после успешного создания
+            if (!isEditMode.value) {
+                // создание
+                await tasksStore.createTask({
+                    title: form.title,
+                    parent_id: currentPath.length ? currentPath[currentPath.length - 1].id : null
+                })
+                await tasksStore.getTasks()
+                router.push({ name: 'tasks' }) // Переход после успешного создания
+            } else {
+                //update
+
+            }
         } catch (error) {
             if (error.response?.data?.errors) {
                 error.response.data.errors.forEach(err => {
@@ -74,6 +81,11 @@ const handleCancel = () => {
 
 // Хуки
 onMounted(async () => {
+    if (task) {
+        form.title = task.title
+        form.parent_id = task.parent_id
+    }
+
     if (!tasksStore.tasks.length) {
         await tasksStore.getTasks()
     }
@@ -138,10 +150,11 @@ onMounted(async () => {
                 <div class="my-16">
                     <label for="title" class="block text-2xl font-medium text-gray-700 mb-1">Название задачи <span
                             class="text-red-400">*</span></label>
-                    <input id="title" v-model="form.title" type="text"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[color(var([--color-text)] focus:ring-2 focus:ring-[color(var([--color-text)]/10 transition-all"
-                        :class="{ 'border-red-500': v$.title.$error }" @blur="v$.title.$touch"
+
+                    <input id="title" v-model="form.title" type="text" :class="['w-full px-4 py-3 border border-gray-300 rounded - lg focus: border - [color(var([--color - text)] focus: ring - 2 focus: ring - [color(var([--color - text)] / 10 transition - all',
+                        v$.title.$error ? 'is - invalid' : 'border-gray-300']" @blur="v$.title.$touch"
                         placeholder="Введите название новой задачи">
+
                     <span v-if="v$.title.$error" class="text-xl text-red-500 mt-1">
                         Название обязательно
                     </span>

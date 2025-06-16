@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useTasksStore } from '@/stores/tasks'
 import { useUIStore } from '@/stores/ui'
 import Trash from '@/assets/icon/Trash.vue'
+import router from '@/router'
 
 const props = defineProps({
     task: Object,
@@ -34,7 +35,7 @@ const isHighlighted = computed(() =>
 
 // Методы
 const toggleExpand = () => {
-    uiStore.toggleTaskExpansion(props.task.id)
+    uiStore.toggleTask(props.task.id)
 }
 
 const handleDoubleClick = () => {
@@ -43,8 +44,10 @@ const handleDoubleClick = () => {
     }
 }
 const editTask = () => {
-    // console.log(`/tasks/${props.task.id}/edit`)
-    router.push(`/tasks/${props.task.id}/edit`)
+    router.push({
+        name: 'edit-task',
+        params: { id: props.task.id },
+    })
 }
 
 const deleteTask = async () => {
